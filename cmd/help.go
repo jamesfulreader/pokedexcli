@@ -12,7 +12,7 @@ func CommandHelp() error {
 	for _, cmd := range commands {
 		fmt.Printf("%s: %s\n", cmd.Name, cmd.Description)
 	}
-
 	fmt.Println()
+
 	return nil
 }
