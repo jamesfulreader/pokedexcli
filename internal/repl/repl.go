@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+
+	"github.com/jamesfulreader/pokedexcli/cmd"
 )
 
 func StartRepl() {
@@ -14,26 +16,13 @@ func StartRepl() {
 		input := scanner.Text()
 
 		if input == "help" {
-			commandHelp()
+			cmd.CommandHelp()
 			fmt.Println("Help")
 		} else if input == "exit" {
-			commandExit()
+			cmd.CommandExit()
 		} else {
 			fmt.Println("unrecognized command")
-			commandHelp()
+			cmd.CommandHelp()
 		}
 	}
-}
-
-func commandHelp() {
-	fmt.Println()
-	fmt.Println("Welcome to the Pokedex!")
-	fmt.Println()
-	fmt.Println("Usage:\nhelp: Displays a help message\nexit: Exit the Pokedex")
-	fmt.Println()
-}
-
-func commandExit() {
-	fmt.Println("Exiting . . .")
-	os.Exit(1)
 }
