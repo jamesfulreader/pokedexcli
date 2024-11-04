@@ -9,9 +9,9 @@ import (
 )
 
 type LocationURL struct {
-	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous any    `json:"previous"`
+	Count    int     `json:"count"`
+	Next     string  `json:"next"`
+	Previous *string `json:"previous"`
 	Results  []struct {
 		Name string `json:"name"`
 		URL  string `json:"url"`
@@ -40,7 +40,7 @@ func CommandMap() error {
 	if err != nil {
 		log.Fatalf("error with unmarshaling JSON: %s", err)
 	}
-
+	fmt.Println(locationURL)
 	locationsArray := locationURL.Results
 	for _, locationItem := range locationsArray {
 		fmt.Println(locationItem.Name)
