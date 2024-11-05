@@ -24,6 +24,7 @@ var count int = 0
 var pokeapi string = "https://pokeapi.co/api/v2/location/?offset=0&limit=20"
 
 func CommandMap() error {
+	fmt.Println()
 	if count >= 0 {
 		if nextURL != "" { // Check if nextURL is not nil
 			pokeapi = nextURL
@@ -63,13 +64,18 @@ func CommandMap() error {
 	for _, locationItem := range locationsArray {
 		fmt.Println(locationItem.Name)
 	}
+	fmt.Println()
 	count++
 	return nil
 }
 
 func CommandMapB() error {
-	if count <= 0 {
-		fmt.Println("cannot go back")
+	fmt.Println()
+	if count <= 1 {
+		fmt.Println()
+		fmt.Println("cannot go back any further")
+		fmt.Println()
+		count = 0
 	}
 	if prevURL != "" { // Check if prevURL is not nil
 		pokeapi = prevURL
@@ -108,6 +114,7 @@ func CommandMapB() error {
 	for _, locationItem := range locationsArray {
 		fmt.Println(locationItem.Name)
 	}
+	fmt.Println()
 	count--
 	return nil
 }
