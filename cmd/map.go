@@ -1,120 +1,73 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
+
+	"github.com/jamesfulreader/pokedexcli/internal/pokeapi"
 )
 
-type LocationURL struct {
-	Count    int     `json:"count"`
-	Next     *string `json:"next"`
-	Previous *string `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"results"`
-}
-
-var nextURL string
-var prevURL string
-var count int = 0
-var pokeapi string = "https://pokeapi.co/api/v2/location/?offset=0&limit=20"
+var (
+	nextURL string
+	prevURL string
+	client  = pokeapi.NewClient()
+)
 
 func CommandMap() error {
 	fmt.Println()
-	if count >= 0 {
-		if nextURL != "" { // Check if nextURL is not nil
-			pokeapi = nextURL
-		}
+
+	var pageURL *string
+	if nextURL != "" {
+		pageURL = &nextURL
 	}
 
-	res, err := http.Get(pokeapi)
+	locationURL, err := client.GetLocations(pageURL)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	if res.StatusCode > 299 {
-		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-	}
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	locationURL := LocationURL{}
-	err = json.Unmarshal(body, &locationURL)
-	if err != nil {
-		log.Fatalf("error with unmarshaling JSON: %s", err)
+		return err
 	}
 
 	if locationURL.Next != nil {
 		nextURL = *locationURL.Next
 	}
-
 	if locationURL.Previous != nil {
 		prevURL = *locationURL.Previous
 	}
 
-	locationsArray := locationURL.Results
-	for _, locationItem := range locationsArray {
+	for _, locationItem := range locationURL.Results {
 		fmt.Println(locationItem.Name)
 	}
+
 	fmt.Println()
-	count++
 	return nil
 }
 
 func CommandMapB() error {
-	fmt.Println()
-	if count <= 1 {
+	if prevURL == "" {
 		fmt.Println()
 		fmt.Println("cannot go back any further")
 		fmt.Println()
-		count = 0
-	}
-	if prevURL != "" { // Check if prevURL is not nil
-		pokeapi = prevURL
+		return nil
 	}
 
-	res, err := http.Get(pokeapi)
+	var pageURL *string
+	if prevURL != "" {
+		pageURL = &prevURL
+	}
+
+	locationURL, err := client.GetLocations(pageURL)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	if res.StatusCode > 299 {
-		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-	}
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	locationURL := LocationURL{}
-	err = json.Unmarshal(body, &locationURL)
-	if err != nil {
-		log.Fatalf("error with unmarshaling JSON: %s", err)
+		return err
 	}
 
 	if locationURL.Next != nil {
 		nextURL = *locationURL.Next
 	}
-
 	if locationURL.Previous != nil {
 		prevURL = *locationURL.Previous
 	}
 
-	locationsArray := locationURL.Results
-	for _, locationItem := range locationsArray {
+	for _, locationItem := range locationURL.Results {
 		fmt.Println(locationItem.Name)
 	}
 	fmt.Println()
-	count--
 	return nil
 }
