@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/jamesfulreader/pokedexcli/internal/pokecahe"
 )
 
 type Client struct {
 	pokeAPIURL string
 	httpClient *http.Client
+	cache      *pokecahe.Cache
 }
 
 type LocationURL struct {
@@ -35,6 +38,15 @@ func (c *Client) GetLocations(pageURL *string) (LocationURL, error) {
 		url = *pageURL
 	}
 
+	if data, found := c.cache.Get(url); found {
+		locationURL := LocationURL{}
+		err := json.Unmarshal(data, &locationURL)
+		if err != nil {
+			return LocationURL{}, fmt.Errorf("error unmarshaling cached json: %s", err)
+		}
+		return locationURL, nil
+	}
+
 	res, err := c.httpClient.Get(url)
 	if err != nil {
 		return LocationURL{}, err
@@ -49,6 +61,8 @@ func (c *Client) GetLocations(pageURL *string) (LocationURL, error) {
 	if res.StatusCode > 299 {
 		return LocationURL{}, fmt.Errorf("response failed with status code: %d and\nbodye: %s", res.StatusCode, body)
 	}
+
+	c.cache.Add(url, body)
 
 	locationURL := LocationURL{}
 	err = json.Unmarshal(body, &locationURL)
