@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
-	"github.com/jamesfulreader/pokedexcli/internal/pokecahe"
+	"github.com/jamesfulreader/pokedexcli/internal/pokecache"
 )
 
 type Client struct {
 	pokeAPIURL string
 	httpClient *http.Client
-	cache      *pokecahe.Cache
+	cache      *pokecache.Cache
 }
 
 type LocationURL struct {
@@ -29,6 +30,7 @@ func NewClient() *Client {
 	return &Client{
 		pokeAPIURL: "https://pokeapi.co/api/v2",
 		httpClient: &http.Client{},
+		cache:      pokecache.NewCache(5 * time.Minute),
 	}
 }
 

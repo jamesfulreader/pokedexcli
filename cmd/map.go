@@ -12,7 +12,7 @@ var (
 	client  = pokeapi.NewClient()
 )
 
-func CommandMap() error {
+func CommandMap([]string) error {
 	fmt.Println()
 
 	var pageURL *string
@@ -40,7 +40,7 @@ func CommandMap() error {
 	return nil
 }
 
-func CommandMapB() error {
+func CommandMapB([]string) error {
 	if prevURL == "" {
 		fmt.Println()
 		fmt.Println("cannot go back any further")

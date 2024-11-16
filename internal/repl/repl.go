@@ -20,15 +20,22 @@ func StartRepl() {
 		input = strings.ToLower(input)
 		input = strings.TrimSpace(input)
 
-		command, exists := commands[input]
-		if !exists {
-			fmt.Printf("unknown command: %s\n", input)
-			fmt.Println()
-			cmd.CommandHelp()
+		args := strings.Fields(input)
+		if len(args) == 0 {
 			continue
 		}
 
-		err := command.Callback()
+		commandName := strings.ToLower(args[0])
+
+		command, exists := commands[commandName]
+		if !exists {
+			fmt.Printf("unknown command: %s\n", input)
+			fmt.Println()
+			cmd.CommandHelp([]string{})
+			continue
+		}
+
+		err := command.Callback(args)
 		if err != nil {
 			fmt.Printf("Error executing command: %s\n", err)
 		}

@@ -1,4 +1,4 @@
-package pokecahe
+package pokecache
 
 import (
 	"fmt"
