@@ -26,21 +26,18 @@ type LocationURL struct {
 	} `json:"results"`
 }
 
-// Will need something like:
 type LocationArea struct {
-	Name              string             // "pastoria-city-area"
+	Name              string
 	PokemonEncounters []PokemonEncounter `json:"pokemon_encounters"`
 }
 
-// Each Pokemon in the area
 type PokemonEncounter struct {
-	Pokemon Pokemon `json:"pokemon"` // nesting the Pokemon info
+	Pokemon Pokemon `json:"pokemon"`
 }
 
-// The actual Pokemon details
 type Pokemon struct {
-	Name string `json:"name"` // "tentacool"
-	URL  string `json:"url"`  // not needed but usually good to include for completeness
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
 func NewClient() *Client {
@@ -115,12 +112,16 @@ func (c *Client) GetLocationArea(locationName *string) (LocationArea, error) {
 		return LocationArea{}, err
 	}
 
+	if res.StatusCode > 299 {
+		return LocationArea{}, fmt.Errorf("response failed with status code: %d and\nbody: %s", res.StatusCode, body)
+	}
+
 	c.cache.Add(url, body)
 
 	locationDetails := LocationArea{}
 	err = json.Unmarshal(body, &locationDetails)
 	if err != nil {
-		return LocationArea{}, fmt.Errorf("error unmarshaling loc area %s", err)
+		return LocationArea{}, fmt.Errorf("error %s", err)
 	}
 	return locationDetails, nil
 }

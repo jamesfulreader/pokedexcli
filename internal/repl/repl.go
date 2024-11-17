@@ -38,6 +38,7 @@ func StartRepl() {
 		err := command.Callback(args)
 		if err != nil {
 			fmt.Printf("Error executing command: %s\n", err)
+			fmt.Println("enter \"help\" for available commands")
 		}
 	}
 }
