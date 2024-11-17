@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+
+	"github.com/jamesfulreader/pokedexcli/internal/pokedex"
 )
 
 func CommandCatch(pokemonName []string) error {
@@ -22,9 +24,15 @@ func CommandCatch(pokemonName []string) error {
 	randomNumber := rand.Float64()
 
 	if randomNumber <= catchRate {
-		fmt.Println("You caught", data.Name)
+		fmt.Printf("You caught %s!\n", data.Name)
+		entry := pokedex.PokedexEntry{
+			Name:           data.Name,
+			URL:            data.URL,
+			BaseExperience: data.BaseExperience,
+		}
+		config.Pokedex.Add(data.Name, entry)
 	} else {
-		fmt.Println("Failed to catch", data.Name)
+		fmt.Printf("%s got away!\n", data.Name)
 	}
 	return nil
 }
