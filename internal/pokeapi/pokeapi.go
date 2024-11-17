@@ -36,8 +36,9 @@ type PokemonEncounter struct {
 }
 
 type Pokemon struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
+	Name           string `json:"name"`
+	URL            string `json:"url"`
+	BaseExperience int    `json:"base_experience"`
 }
 
 func NewClient() *Client {
@@ -124,4 +125,25 @@ func (c *Client) GetLocationArea(locationName *string) (LocationArea, error) {
 		return LocationArea{}, fmt.Errorf("error %s", err)
 	}
 	return locationDetails, nil
+}
+
+func (c *Client) GetPokemon(pokemonName *string) (Pokemon, error) {
+	url := fmt.Sprintf("%s/pokemon/%s", c.pokeAPIURL, *pokemonName)
+	res, err := c.httpClient.Get(url)
+	if err != nil {
+		return Pokemon{}, fmt.Errorf("error with get %s", err)
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return Pokemon{}, err
+	}
+
+	pokemon := Pokemon{}
+	err = json.Unmarshal(body, &pokemon)
+	if err != nil {
+		return Pokemon{}, fmt.Errorf("error %s", err)
+	}
+	return pokemon, nil
 }
