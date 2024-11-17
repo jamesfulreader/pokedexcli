@@ -26,6 +26,23 @@ type LocationURL struct {
 	} `json:"results"`
 }
 
+// Will need something like:
+type LocationArea struct {
+	Name              string             // "pastoria-city-area"
+	PokemonEncounters []PokemonEncounter `json:"pokemon_encounters"`
+}
+
+// Each Pokemon in the area
+type PokemonEncounter struct {
+	Pokemon Pokemon `json:"pokemon"` // nesting the Pokemon info
+}
+
+// The actual Pokemon details
+type Pokemon struct {
+	Name string `json:"name"` // "tentacool"
+	URL  string `json:"url"`  // not needed but usually good to include for completeness
+}
+
 func NewClient() *Client {
 	return &Client{
 		pokeAPIURL: "https://pokeapi.co/api/v2",
@@ -35,7 +52,7 @@ func NewClient() *Client {
 }
 
 func (c *Client) GetLocations(pageURL *string) (LocationURL, error) {
-	url := fmt.Sprintf("%s/location/?offset=0&limit=20", c.pokeAPIURL)
+	url := fmt.Sprintf("%s/location-area/?offset=0&limit=20", c.pokeAPIURL)
 	if pageURL != nil {
 		url = *pageURL
 	}
@@ -61,7 +78,7 @@ func (c *Client) GetLocations(pageURL *string) (LocationURL, error) {
 	}
 
 	if res.StatusCode > 299 {
-		return LocationURL{}, fmt.Errorf("response failed with status code: %d and\nbodye: %s", res.StatusCode, body)
+		return LocationURL{}, fmt.Errorf("response failed with status code: %d and\nbody: %s", res.StatusCode, body)
 	}
 
 	c.cache.Add(url, body)
@@ -73,5 +90,26 @@ func (c *Client) GetLocations(pageURL *string) (LocationURL, error) {
 	}
 
 	return locationURL, nil
+}
 
+func (c *Client) GetLocationArea(locationName *string) (LocationArea, error) {
+	url := fmt.Sprintf("%s/location-area/%s", c.pokeAPIURL, *locationName)
+
+	res, err := c.httpClient.Get(url)
+	if err != nil {
+		return LocationArea{}, fmt.Errorf("error with get %s", err)
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return LocationArea{}, err
+	}
+
+	locationDetails := LocationArea{}
+	err = json.Unmarshal(body, &locationDetails)
+	if err != nil {
+		return LocationArea{}, fmt.Errorf("error unmarshaling loc area %s", err)
+	}
+	return locationDetails, nil
 }

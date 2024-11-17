@@ -2,34 +2,26 @@ package cmd
 
 import (
 	"fmt"
-
-	"github.com/jamesfulreader/pokedexcli/internal/pokeapi"
-)
-
-var (
-	nextURL string
-	prevURL string
-	client  = pokeapi.NewClient()
 )
 
 func CommandMap([]string) error {
 	fmt.Println()
 
 	var pageURL *string
-	if nextURL != "" {
-		pageURL = &nextURL
+	if config.NextURL != "" {
+		pageURL = &config.NextURL
 	}
 
-	locationURL, err := client.GetLocations(pageURL)
+	locationURL, err := config.Client.GetLocations(pageURL)
 	if err != nil {
 		return err
 	}
 
 	if locationURL.Next != nil {
-		nextURL = *locationURL.Next
+		config.NextURL = *locationURL.Next
 	}
 	if locationURL.Previous != nil {
-		prevURL = *locationURL.Previous
+		config.PrevURL = *locationURL.Previous
 	}
 
 	for _, locationItem := range locationURL.Results {
@@ -41,7 +33,8 @@ func CommandMap([]string) error {
 }
 
 func CommandMapB([]string) error {
-	if prevURL == "" {
+	fmt.Println()
+	if config.PrevURL == "" {
 		fmt.Println()
 		fmt.Println("cannot go back any further")
 		fmt.Println()
@@ -49,20 +42,20 @@ func CommandMapB([]string) error {
 	}
 
 	var pageURL *string
-	if prevURL != "" {
-		pageURL = &prevURL
+	if config.PrevURL != "" {
+		pageURL = &config.PrevURL
 	}
 
-	locationURL, err := client.GetLocations(pageURL)
+	locationURL, err := config.Client.GetLocations(pageURL)
 	if err != nil {
 		return err
 	}
 
 	if locationURL.Next != nil {
-		nextURL = *locationURL.Next
+		config.NextURL = *locationURL.Next
 	}
 	if locationURL.Previous != nil {
-		prevURL = *locationURL.Previous
+		config.PrevURL = *locationURL.Previous
 	}
 
 	for _, locationItem := range locationURL.Results {
