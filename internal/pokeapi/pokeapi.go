@@ -95,6 +95,15 @@ func (c *Client) GetLocations(pageURL *string) (LocationURL, error) {
 func (c *Client) GetLocationArea(locationName *string) (LocationArea, error) {
 	url := fmt.Sprintf("%s/location-area/%s", c.pokeAPIURL, *locationName)
 
+	if data, found := c.cache.Get(url); found {
+		locationArea := LocationArea{}
+		err := json.Unmarshal(data, &locationArea)
+		if err != nil {
+			return LocationArea{}, fmt.Errorf("error unmarshaling cached location data: %s", err)
+		}
+		return locationArea, nil
+	}
+
 	res, err := c.httpClient.Get(url)
 	if err != nil {
 		return LocationArea{}, fmt.Errorf("error with get %s", err)
@@ -105,6 +114,8 @@ func (c *Client) GetLocationArea(locationName *string) (LocationArea, error) {
 	if err != nil {
 		return LocationArea{}, err
 	}
+
+	c.cache.Add(url, body)
 
 	locationDetails := LocationArea{}
 	err = json.Unmarshal(body, &locationDetails)
