@@ -10,7 +10,7 @@ func GetCommands() map[string]CliCommand {
 	return map[string]CliCommand{
 		"help": {
 			Name:        "help",
-			Description: "Displays a help message",
+			Description: "Displays a list of all available commands",
 			Callback:    CommandHelp,
 		},
 		"exit": {
@@ -20,32 +20,32 @@ func GetCommands() map[string]CliCommand {
 		},
 		"map": {
 			Name:        "map",
-			Description: "displays the names of 20 locations",
+			Description: "Shows the next 20 locations in the Pokemon world",
 			Callback:    CommandMap,
 		},
 		"mapb": {
 			Name:        "mapb",
-			Description: "displays the previous 20 locations",
+			Description: "Shows the previous 20 locations",
 			Callback:    CommandMapB,
 		},
 		"explore": {
 			Name:        "explore",
-			Description: "explore location name given as an arguement",
+			Description: "Lists all Pokemon that can be found in a specific location",
 			Callback:    CommandExplore,
 		},
 		"catch": {
 			Name:        "catch",
-			Description: "catch a pokemon name given as arguemnt",
+			Description: "Attempts to catch a Pokemon",
 			Callback:    CommandCatch,
 		},
 		"pokedex": {
 			Name:        "pokedex",
-			Description: "list all of the pokemon in the pokedex",
+			Description: "Lists all Pokemon you have caught",
 			Callback:    CommandPokedex,
 		},
 		"inspect": {
 			Name:        "inspect",
-			Description: "get details on a specific pokemon",
+			Description: "Shows detailed information about a caught Pokemon",
 			Callback:    CommandInspect,
 		},
 	}
