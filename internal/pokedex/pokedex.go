@@ -2,37 +2,40 @@ package pokedex
 
 import (
 	"sync"
+
+	"github.com/jamesfulreader/pokedexcli/internal/models"
 )
 
-type PokedexEntry struct {
-	Name           string
-	URL            string
-	BaseExperience int
-}
-
 type Pokedex struct {
-	entries map[string]PokedexEntry
+	entries map[string]models.Pokemon
 	mutex   sync.RWMutex
 }
 
 func New() *Pokedex {
 	return &Pokedex{
-		entries: make(map[string]PokedexEntry),
+		entries: make(map[string]models.Pokemon),
 	}
 }
 
-func (p *Pokedex) Add(name string, entry PokedexEntry) {
-	p.mutex.RLock()
-	defer p.mutex.RUnlock()
+func (p *Pokedex) Add(name string, entry models.Pokemon) {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 	p.entries[name] = entry
 }
 
-func (p *Pokedex) List() []PokedexEntry {
+func (p *Pokedex) List() []models.Pokemon {
 	p.mutex.RLock()
 	defer p.mutex.RUnlock()
-	pokemon := make([]PokedexEntry, 0, len(p.entries))
+	pokemon := make([]models.Pokemon, 0, len(p.entries))
 	for _, entry := range p.entries {
 		pokemon = append(pokemon, entry)
 	}
 	return pokemon
+}
+
+func (p *Pokedex) Inspect(pokemonName string) (models.Pokemon, bool) {
+	p.mutex.RLock()
+	defer p.mutex.RUnlock()
+	pokemon, exists := p.entries[pokemonName]
+	return pokemon, exists
 }
